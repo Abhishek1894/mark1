@@ -31,6 +31,7 @@ public class HomeActivity extends AppCompatActivity
 
     ProfileFragment profileFragment = new ProfileFragment();
     maintenanceUpdateFragment maintenanceUpdateFragment = new maintenanceUpdateFragment();
+    membersFragment MembersFragment = new membersFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -77,7 +78,7 @@ public class HomeActivity extends AppCompatActivity
                         return true;
 
                     case R.id.adminPayment:
-                        changeFragment(profileFragment,false);
+                        changeFragment(MembersFragment,false);
                         return true;
 
                     case R.id.adminMaintenanceDetails:
