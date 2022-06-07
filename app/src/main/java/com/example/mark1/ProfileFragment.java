@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -87,6 +88,7 @@ public class ProfileFragment extends Fragment
         TextView phoneNo = view.findViewById(R.id.textViewProfilePhoneNo);
         apartmentName = view.findViewById(R.id.textViewProfileApartmentName);
         TextView status = view.findViewById(R.id.textViewProfileStatus);
+        TextView code = view.findViewById(R.id.textViewShareAptCode);
         Button logout = view.findViewById(R.id.buttonProfileLogout);
 
         // code for progress bar
@@ -114,6 +116,7 @@ public class ProfileFragment extends Fragment
                     name.setText(user.getName());
                     phoneNo.setText(user.getPhoneNo());
                     status.setText(user.getStatus());
+                    code.setText(user.getAptCode());
                     getApartmentName(reference,user.getAptCode());
 
                     profileProgressDialog.cancel();
@@ -139,6 +142,20 @@ public class ProfileFragment extends Fragment
             getActivity().finish();
         });
 
+
+        // code to share apartment code
+        ImageView shareCode = view.findViewById(R.id.imageViewShareIcon);
+        String shCode = "-NOuH57clSC7-MgFb8Qu";
+        // code to add clickListener to image
+        shareCode.setOnClickListener(v->
+        {
+            Toast.makeText(getActivity(), "Sharing the code...", Toast.LENGTH_SHORT).show();
+            //method to share code in whatsapp using implicit intent
+            shareCode(shCode);
+        });
+
+
+
         return view;
     }
 
@@ -162,4 +179,27 @@ public class ProfileFragment extends Fragment
             }
         });
     }
+
+    //method to share the code
+    private void shareCode(String code)
+    {
+        // Creating new intent
+        Intent intent = new Intent(Intent.ACTION_SEND);
+
+        intent.setType("text/plain");
+        intent.setPackage("com.whatsapp");
+
+        // Give your message here
+        intent.putExtra(Intent.EXTRA_TEXT, code);
+
+        // Checking whether Whatsapp is installed or not
+        if (intent.resolveActivity( getActivity().getPackageManager()) == null)
+        {
+            Toast.makeText(getActivity(), "Please install whatsapp first.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        // Starting Whatsapp
+        startActivity(intent);
+    }
+
 }

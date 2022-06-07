@@ -7,6 +7,9 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -65,6 +68,17 @@ public class maintenanceUpdateFragment extends Fragment
     {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_maintenance_update, container, false);
+
+
+        //finding the ID's of UI Components
+        EditText updateMaintenance = view.findViewById(R.id.editTextUpdateMaintenance);
+        Button update = view.findViewById(R.id.buttonUpdate);
+
+        update.setOnClickListener(v->
+        {
+            Toast.makeText(getActivity(), "New Maintenance Updated Successfully!", Toast.LENGTH_SHORT).show();
+        });
+
 
         return view;
     }

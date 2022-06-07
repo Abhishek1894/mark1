@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,13 +7,60 @@
     android:orientation="vertical"
     tools:context=".maintenanceUpdateFragment">
 
-    <TextView
+    <LinearLayout
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/updateMaintenanceFragment"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:layout_margin="10dp"
-        />
+        android:orientation="vertical">
 
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/updateMaintenanceFragment"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_margin="10dp"
+            />
+
+        <!--this is the outlined layout box for the edit text-->
+        <!--this layout must be used to reposition or change the
+            height and width of the edit text-->
+        <!--to get the outlined edit text the style attribute as
+            following must be invoked-->
+        <com.google.android.material.textfield.TextInputLayout
+
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="22dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="22dp"
+            android:hint="@string/updateMaintenanceFragment"
+            android:importantForAutofill="no"
+            >
+
+            <!--this is the actual edit text which takes the input-->
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextUpdateMaintenance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"/>
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <Button
+            android:id="@+id/buttonUpdate"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_weight="3"
+            android:text="@string/updateMaintenance"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</ScrollView>

@@ -7,13 +7,15 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardUseCompatPadding="true">
+        app:cardUseCompatPadding="true"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="10dp"
+            android:background="@drawable/profile_bottom_border">
 
             <TextView
                 android:id="@+id/memberNameTextView"
