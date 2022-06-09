@@ -2,6 +2,7 @@ package com.example.mark1;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -10,6 +11,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,6 +71,8 @@ public class maintenanceUpdateFragment extends Fragment
         }
     }
 
+    String apartmentCode;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState)
     {
@@ -74,11 +84,41 @@ public class maintenanceUpdateFragment extends Fragment
         EditText updateMaintenance = view.findViewById(R.id.editTextUpdateMaintenance);
         Button update = view.findViewById(R.id.buttonUpdate);
 
-        update.setOnClickListener(v->
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference();
+
+        reference.child("users").child(userEmail.substring(0,userEmail.length() - 4)).addValueEventListener(new ValueEventListener()
         {
-            Toast.makeText(getActivity(), "New Maintenance Updated Successfully!", Toast.LENGTH_SHORT).show();
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot)
+            {
+                if(snapshot.exists())
+                {
+                    User user = snapshot.getValue(User.class);
+                    apartmentCode = user.getAptCode();
+                }
+                else
+                {
+                    Toast.makeText(getActivity(),"Data does not exist",Toast.LENGTH_SHORT).show();
+                    apartmentCode = "Some error occured try again to share the code";
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error)
+            {
+                Toast.makeText(getActivity(),"Error in data fetching",Toast.LENGTH_SHORT).show();
+            }
         });
 
+
+        update.setOnClickListener(v ->
+        {
+            reference.child("apartments").child(apartmentCode).child("maintenance").setValue(updateMaintenance.getText().toString());
+            Toast.makeText(getActivity(), "Maintenance updated successfully", Toast.LENGTH_SHORT).show();
+        });
 
         return view;
     }

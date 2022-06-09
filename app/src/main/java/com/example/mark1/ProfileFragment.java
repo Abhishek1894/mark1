@@ -75,6 +75,7 @@ public class ProfileFragment extends Fragment
     }
 
     TextView apartmentName;
+    String apartmentCode;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState)
@@ -116,14 +117,15 @@ public class ProfileFragment extends Fragment
                     name.setText(user.getName());
                     phoneNo.setText(user.getPhoneNo());
                     status.setText(user.getStatus());
+                    apartmentCode = user.getAptCode();
                     code.setText(user.getAptCode());
                     getApartmentName(reference,user.getAptCode());
-
                     profileProgressDialog.cancel();
                 }
                 else
                 {
                     Toast.makeText(getActivity(),"Data does not exist",Toast.LENGTH_SHORT).show();
+                    apartmentCode = "Some error occured try again to share the code";
                 }
             }
 
@@ -145,13 +147,13 @@ public class ProfileFragment extends Fragment
 
         // code to share apartment code
         ImageView shareCode = view.findViewById(R.id.imageViewShareIcon);
-        String shCode = "-NOuH57clSC7-MgFb8Qu";
+        // String shCode = user.getAptCode();
         // code to add clickListener to image
         shareCode.setOnClickListener(v->
         {
             Toast.makeText(getActivity(), "Sharing the code...", Toast.LENGTH_SHORT).show();
             //method to share code in whatsapp using implicit intent
-            shareCode(shCode);
+            shareCode(apartmentCode);
         });
 
 
@@ -168,6 +170,7 @@ public class ProfileFragment extends Fragment
             {
                 if(snapshot.exists())
                 {
+
                     apartmentName.setText((String)snapshot.getValue());
                 }
             }
@@ -193,7 +196,7 @@ public class ProfileFragment extends Fragment
         intent.putExtra(Intent.EXTRA_TEXT, code);
 
         // Checking whether Whatsapp is installed or not
-        if (intent.resolveActivity( getActivity().getPackageManager()) == null)
+        if (intent.resolveActivity(getActivity().getPackageManager()) == null)
         {
             Toast.makeText(getActivity(), "Please install whatsapp first.", Toast.LENGTH_SHORT).show();
             return;

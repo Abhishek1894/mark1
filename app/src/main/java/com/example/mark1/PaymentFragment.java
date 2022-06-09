@@ -44,6 +44,8 @@ public class PaymentFragment extends Fragment
         nameEt = view.findViewById(R.id.editTextPaymentName);
         noteEt = view.findViewById(R.id.editTextPaymentNote);
 
+        upiIdEt.setText("9130205500@ybl");
+
         pay.setOnClickListener(v->
         {
             //Getting the values from the EditTexts
@@ -113,7 +115,8 @@ public class PaymentFragment extends Fragment
         }
     }
 
-    private void upiPaymentDataOperation(ArrayList<String> data) {
+    private void upiPaymentDataOperation(ArrayList<String> data)
+    {
         if (isConnectionAvailable(getActivity()))
         {
             String str = data.get(0);
@@ -158,7 +161,8 @@ public class PaymentFragment extends Fragment
     public static boolean isConnectionAvailable(Context context)
     {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
+        if (connectivityManager != null)
+        {
             NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
             if (netInfo != null && netInfo.isConnected()
                     && netInfo.isConnectedOrConnecting()
