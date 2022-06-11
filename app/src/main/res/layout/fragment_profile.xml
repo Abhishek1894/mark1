@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ProfileFragment">
+    tools:context=".ProfileFragment"
+    android:background="#DEF8F6F6">
 
 <!--    <ImageView-->
 <!--        android:layout_width="match_parent"-->
@@ -21,6 +22,15 @@
 <!--        android:textSize="25sp"-->
 <!--        android:gravity="center"-->
 <!--        />-->
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:cardCornerRadius="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -297,10 +307,11 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:text="@string/logout"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:layout_marginBottom="10dp"/>
 
     </LinearLayout>
 
-
+   </androidx.cardview.widget.CardView>
 
 </ScrollView>

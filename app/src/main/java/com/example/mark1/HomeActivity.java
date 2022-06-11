@@ -79,11 +79,15 @@ public class HomeActivity extends AppCompatActivity
                         return true;
 
                     case R.id.adminPayment:
-                        changeFragment(MembersFragment,false);
+                        changeFragment(paymentFragment,false);
                         return true;
 
                     case R.id.adminMaintenanceDetails:
-                        changeFragment(paymentFragment,false);
+                        changeFragment(MembersFragment,false);
+                        return true;
+
+                    case R.id.adminMembers:
+                        changeFragment(MembersFragment,false);
                         return true;
 
                 }

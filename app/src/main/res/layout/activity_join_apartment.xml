@@ -5,7 +5,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".JoinApartmentActivity">
+    tools:context=".JoinApartmentActivity"
+    android:background="#DEF8F6F6"
+    >
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:cardCornerRadius="12dp">
 
         <LinearLayout
 
@@ -225,7 +236,9 @@
                 android:layout_weight="3"
                 android:text="@string/buttonJoin"
                 android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:layout_marginBottom="10dp"/>
 
         </LinearLayout>
+    </androidx.cardview.widget.CardView>
 </ScrollView>

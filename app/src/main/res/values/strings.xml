@@ -28,4 +28,5 @@
     <string name="updateMaintenanceFragment">Update Maintenance</string>
     <string name="myProfile">Profile</string>
     <string name="logout">Logout</string>
+    <string name="members">Members</string>
 </resources>

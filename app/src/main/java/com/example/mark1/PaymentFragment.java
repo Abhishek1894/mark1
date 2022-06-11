@@ -21,11 +21,12 @@ import java.util.ArrayList;
 public class PaymentFragment extends Fragment
 {
 
+    private static final int RESULT_OK = -1;
     EditText amountEt, noteEt, nameEt, upiIdEt;
     Button pay;
 
     final int UPI_PAYMENT = 0;
-    private static final int RESULT_OK = -1;
+    // private static final int RESULT_OK;
 
 
     public PaymentFragment() {
@@ -61,7 +62,8 @@ public class PaymentFragment extends Fragment
         return view;
     }
 
-    void payUsingUpi(String amount, String upiId, String name, String note) {
+    void payUsingUpi(String amount, String upiId, String name, String note)
+    {
 
         Uri uri = Uri.parse("upi://pay").buildUpon()
                 .appendQueryParameter("pa", upiId)
@@ -90,22 +92,29 @@ public class PaymentFragment extends Fragment
     public void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
 
-        switch (requestCode) {
+        switch (requestCode)
+        {
             case UPI_PAYMENT:
-                if ((RESULT_OK == resultCode) || (resultCode == 11)) {
-                    if (data != null) {
+                if ((RESULT_OK == resultCode) || (resultCode == 11))
+                {
+                    if (data != null)
+                    {
                         String string = data.getStringExtra("response");
                         Log.d("UPI", "onActivityResult: " + string);
                         ArrayList<String> dataList = new ArrayList<>();
                         dataList.add(string);
                         upiPaymentDataOperation(dataList);
-                    } else {
+                    }
+                    else
+                    {
                         Log.d("UPI", "onActivityResult: " + "Return data is null");
                         ArrayList<String> dataList = new ArrayList<>();
                         dataList.add("nothing");
                         upiPaymentDataOperation(dataList);
                     }
-                } else {
+                }
+                else
+                {
                     Log.d("UPI", "onActivityResult: " + "Return data is null"); //when user simply back without payment
                     ArrayList<String> dataList = new ArrayList<>();
                     dataList.add("nothing");
@@ -127,10 +136,10 @@ public class PaymentFragment extends Fragment
             String approvalRefNo = "";
             String response[] = str.split("&");
             for (int i = 0; i < response.length; i++)
-            {
+            { 
                 String equalStr[] = response[i].split("=");
                 if(equalStr.length >= 2) {
-                    if (equalStr[0].toLowerCase().equals("Status".toLowerCase())) {
+                    if (equalStr[0].toLowerCase().equals("status".toLowerCase())) {
                         status = equalStr[1].toLowerCase();
                     }
                     else if (equalStr[0].toLowerCase().equals("ApprovalRefNo".toLowerCase()) || equalStr[0].toLowerCase().equals("txnRef".toLowerCase())) {
