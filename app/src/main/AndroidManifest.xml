@@ -3,6 +3,7 @@
     package="com.example.mark1">
 
 <!--    following code is added while upiPayment fragment-->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
