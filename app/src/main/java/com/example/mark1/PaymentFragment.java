@@ -127,7 +127,12 @@ public class PaymentFragment extends Fragment  implements PaymentResultListener{
         paybtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                makePayment();
+
+            Intent intent= new Intent(getActivity(),RazorpayPayment.class);
+            startActivity(intent);
+                ((Activity) getActivity()).overridePendingTransition(0, 0);
+
+//                makePayment();
             }
         });
 
@@ -179,7 +184,7 @@ public class PaymentFragment extends Fragment  implements PaymentResultListener{
         Month currentMonth = currentdate.getMonth();
         String month = currentMonth.toString();
 
-        paybtn.setEnabled(false);
+        // paybtn.setEnabled(false);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference();
@@ -214,6 +219,36 @@ public class PaymentFragment extends Fragment  implements PaymentResultListener{
         String str = "Failed and cause is :"+s;
         paytext.setText(str);
         Toast.makeText(getActivity(),"Payment Failed",Toast.LENGTH_SHORT).show();
+
+        LocalDate currentdate = LocalDate.now();
+        Month currentMonth = currentdate.getMonth();
+        String month = currentMonth.toString();
+
+        // paybtn.setEnabled(false);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference();
+
+        reference.child("apartments").child(aptCode).child("balance").addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    String balance = snapshot.getValue(String.class);
+                    Integer bal = Integer.parseInt(balance);
+                    bal += Integer.parseInt(amount.getText().toString());
+                    reference.child("apartments").child(aptCode).child("balance").setValue(String.valueOf(bal));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error)
+            {
+
+            }
+        });
     }
 
 

@@ -26,6 +26,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 public class HomeActivity extends AppCompatActivity
 {
     Button logout;
@@ -134,6 +136,8 @@ public class HomeActivity extends AppCompatActivity
             }
         });
 
+        // for notification
+        FirebaseMessaging.getInstance().subscribeToTopic("notify");// to get notification using firebase.
     }
 
     // method to change the Fragment

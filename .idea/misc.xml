@@ -48,11 +48,13 @@
         <entry key="..\:/mark1/app/src/main/res/menu/admin_nav_bar_menu.xml" value="0.2234375" />
         <entry key="..\:/mark4/app/src/main/res/drawable/ic_baseline_people_24.xml" value="0.232" />
         <entry key="..\:/mark4/app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.232" />
+        <entry key="..\:/mark4/app/src/main/res/layout/activity_final_payment.xml" value="0.22916666666666666" />
         <entry key="..\:/mark4/app/src/main/res/layout/activity_home.xml" value="0.22916666666666666" />
         <entry key="..\:/mark4/app/src/main/res/layout/activity_join_apartment.xml" value="0.22916666666666666" />
         <entry key="..\:/mark4/app/src/main/res/layout/activity_login.xml" value="0.22916666666666666" />
         <entry key="..\:/mark4/app/src/main/res/layout/activity_main.xml" value="0.22916666666666666" />
         <entry key="..\:/mark4/app/src/main/res/layout/activity_options.xml" value="0.22916666666666666" />
+        <entry key="..\:/mark4/app/src/main/res/layout/activity_razorpay_payment.xml" value="0.22916666666666666" />
         <entry key="..\:/mark4/app/src/main/res/layout/activity_register_apartment.xml" value="0.22916666666666666" />
         <entry key="..\:/mark4/app/src/main/res/layout/fragment_maintenance_update.xml" value="0.22916666666666666" />
         <entry key="..\:/mark4/app/src/main/res/layout/fragment_members.xml" value="0.22916666666666666" />
