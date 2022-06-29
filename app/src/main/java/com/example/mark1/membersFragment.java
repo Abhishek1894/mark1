@@ -89,33 +89,13 @@ public class membersFragment extends Fragment
 
         String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
+        //fetching data using bundle from HomeActivity
+        Bundle bundle;
+        bundle = getArguments();
+        String aptCode = bundle.getString("userAptCode");
+
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference();
-        reference.child("users").child(userEmail.substring(0,userEmail.length() - 4)).addValueEventListener(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot)
-            {
-                if(snapshot.exists())
-                {
-                    User user = snapshot.getValue(User.class);
-
-                    aptCode = user.getAptCode();
-
-                    // profileProgressDialog.cancel();
-                }
-                else
-                {
-                    Toast.makeText(getActivity(),"Data does not exist",Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error)
-            {
-                Toast.makeText(getActivity(),"Error in data fetching",Toast.LENGTH_SHORT).show();
-            }
-        });
 
         reference.child("users").addValueEventListener(new ValueEventListener()
         {

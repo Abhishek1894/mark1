@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class RegisterApartment extends AppCompatActivity
@@ -130,12 +131,39 @@ public class RegisterApartment extends AppCompatActivity
 
                             HashMap<String,Object> apartment = new HashMap<>();
                             apartment.put("name",apartmentName);
-                            apartment.put("balance",0);
-                            apartment.put("maintenance",0);
+                            apartment.put("balance","0");
+                            apartment.put("maintenance","0");
 
                             // code for adding new user in real-time database
                             reference.child("users").child(email.substring(0,email.length() - 4)).setValue(user);
                             reference.child("apartments").child(aptCode).setValue(apartment);
+
+                            // code for adding users in payment records
+                            HashMap<String,Object> record = new HashMap<>();
+                            record.put("name",name);
+                            record.put("aptcode",aptCode);
+                            record.put("amount","0");
+                            record.put("status",false);
+
+                            ArrayList<String> monthList = new ArrayList<>();
+
+                            monthList.add("January");
+                            monthList.add("February");
+                            monthList.add("March");
+                            monthList.add("April");
+                            monthList.add("May");
+                            monthList.add("June");
+                            monthList.add("July");
+                            monthList.add("August");
+                            monthList.add("September");
+                            monthList.add("October");
+                            monthList.add("November");
+                            monthList.add("December");
+
+                            for(String data : monthList)
+                            {
+                                reference.child("payments").child(data).child(email.substring(0,email.length() - 4)).setValue(record);
+                            }
 
 
                             Toast.makeText(RegisterApartment.this,"Data Saved Successfully and ",Toast.LENGTH_SHORT).show();

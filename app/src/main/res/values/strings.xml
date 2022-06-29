@@ -29,4 +29,5 @@
     <string name="myProfile">Profile</string>
     <string name="logout">Logout</string>
     <string name="members">Members</string>
+    <string name="maintenance_payment">Maintenance Payment</string>
 </resources>

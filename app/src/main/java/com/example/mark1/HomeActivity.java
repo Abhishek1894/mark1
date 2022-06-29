@@ -14,16 +14,23 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class HomeActivity extends AppCompatActivity
 {
     Button logout;
     TextView text;
+    Bundle bundle;//bundle to pass data from HomeActivity to other fragments.
 
     FirebaseAuth auth = FirebaseAuth.getInstance();
     FirebaseUser user = auth.getCurrentUser();
@@ -33,6 +40,7 @@ public class HomeActivity extends AppCompatActivity
     maintenanceUpdateFragment maintenanceUpdateFragment = new maintenanceUpdateFragment();
     membersFragment MembersFragment = new membersFragment();
     PaymentFragment paymentFragment = new PaymentFragment();
+    RecordFragment recordFragment = new RecordFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -40,19 +48,50 @@ public class HomeActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-//        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-//
-//        logout = findViewById(R.id.logoutButton);
-//        text = findViewById(R.id.text);
-//
-//        text.setText(email);
-//
-//        logout.setOnClickListener(v ->
-//        {
-//            FirebaseAuth.getInstance().signOut();
-//            startActivity(new Intent(HomeActivity.this,OptionsActivity.class));
-//            finish();
-//        });
+        // fetching the data
+
+        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference();
+
+        reference.child("users").child(userEmail.substring(0,userEmail.length() - 4)).addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot)
+            {
+                if(snapshot.exists())
+                {
+                    User user = snapshot.getValue(User.class);
+                    if(user!=null) {
+                        //passing User object to other fragments
+                        bundle = new Bundle();
+                        bundle.putString("userName",user.getName());
+                        bundle.putString("userEmail",user.getEmail());
+                        bundle.putString("userAptCode",user.getAptCode());
+                        bundle.putString("userPhoneNo",user.getPhoneNo());
+                        bundle.putString("userStatus",user.getStatus());
+                        //sending user data to maintenanceUpdateFragment
+                        maintenanceUpdateFragment.setArguments(bundle);
+                        MembersFragment.setArguments(bundle);
+                        paymentFragment.setArguments(bundle);
+
+//                        Toast.makeText(HomeActivity.this, "sending data userName = "+user.getName(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else
+                {
+                    Toast.makeText(HomeActivity.this,"Data does not exist",Toast.LENGTH_SHORT).show();
+                   // apartmentCode = "Some error occured try again to share the code";
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error)
+            {
+                Toast.makeText(HomeActivity.this,"Error in data fetching",Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Bottom navigation bar code
         bottomNavigationView = findViewById(R.id.bottom_navigationBar);
@@ -83,7 +122,7 @@ public class HomeActivity extends AppCompatActivity
                         return true;
 
                     case R.id.adminMaintenanceDetails:
-                        changeFragment(MembersFragment,false);
+                        changeFragment(recordFragment,false);
                         return true;
 
                     case R.id.adminMembers:

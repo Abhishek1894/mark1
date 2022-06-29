@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -83,26 +84,35 @@ public class maintenanceUpdateFragment extends Fragment
         //finding the ID's of UI Components
         EditText updateMaintenance = view.findViewById(R.id.editTextUpdateMaintenance);
         Button update = view.findViewById(R.id.buttonUpdate);
+        TextView currentMaintenance = view.findViewById(R.id.textViewCurrentMaintenance);
+
+        //fetching data using bundle from HomeActivity
+        Bundle bundle;
+        bundle = getArguments();
+        String apartmentCode = bundle.getString("userAptCode");
+        String status = bundle.getString("userStatus");
+
 
         String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference();
 
-        reference.child("users").child(userEmail.substring(0,userEmail.length() - 4)).addValueEventListener(new ValueEventListener()
+        // code to fetch the current maintenance of the building
+        reference.child("apartments").child(apartmentCode).child("maintenance").addValueEventListener(new ValueEventListener()
         {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot)
             {
                 if(snapshot.exists())
                 {
-                    User user = snapshot.getValue(User.class);
-                    apartmentCode = user.getAptCode();
+                    String maintenance = snapshot.getValue(String.class);
+                    String c = "Current Maintenance = "+maintenance+ " Rs.";
+                    currentMaintenance.setText(c);
                 }
                 else
                 {
                     Toast.makeText(getActivity(),"Data does not exist",Toast.LENGTH_SHORT).show();
-                    apartmentCode = "Some error occured try again to share the code";
                 }
             }
 
@@ -113,6 +123,10 @@ public class maintenanceUpdateFragment extends Fragment
             }
         });
 
+        if(!status.equals("admin"))
+            update.setEnabled(false);
+        else
+            update.setEnabled(true);
 
         update.setOnClickListener(v ->
         {

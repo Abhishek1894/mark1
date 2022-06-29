@@ -1,35 +1,58 @@
 package com.example.mark1;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.Bundle;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Activity;
 import androidx.fragment.app.Fragment;
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-public class PaymentFragment extends Fragment
-{
+import com.razorpay.Checkout;
+import com.razorpay.ExternalWalletListener;
+import com.razorpay.PaymentData;
+import com.razorpay.PaymentResultListener;
+import com.razorpay.PaymentResultWithDataListener;
 
-    private static final int RESULT_OK = -1;
-    EditText amountEt, noteEt, nameEt, upiIdEt;
-    Button pay;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Text;
 
-    final int UPI_PAYMENT = 0;
-    // private static final int RESULT_OK;
+import java.time.LocalDate;
+import java.time.Month;
 
 
-    public PaymentFragment() {
+public class PaymentFragment extends Fragment  implements PaymentResultListener{
+
+
+
+    Button paybtn;
+    TextView paytext;
+
+    EditText email , amount , name , contact;
+
+    String userName,userEmail,userPhone,aptCode;
+
+    public PaymentFragment()
+    {
         // Required empty public constructor
     }
 
@@ -39,150 +62,161 @@ public class PaymentFragment extends Fragment
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_payment, container, false);
 
-        amountEt = view.findViewById(R.id.editTextPaymentAmount);
-        upiIdEt = view.findViewById(R.id.editTextPaymentUpiId);
-        pay = view.findViewById(R.id.btnPaymentPay);
-        nameEt = view.findViewById(R.id.editTextPaymentName);
-        noteEt = view.findViewById(R.id.editTextPaymentNote);
 
-        upiIdEt.setText("9130205500@ybl");
 
-        pay.setOnClickListener(v->
+        // ------------------------------------- RazorPay Code ----------------------------------------
+
+        // To ensure faster loading of the Checkout form, call this method as early as possible in your checkout flow.
+        Checkout.preload(getActivity());
+
+        paytext=view.findViewById(R.id.paytext);
+        paybtn=view.findViewById(R.id.paybtn);
+        name = view.findViewById(R.id.editTextPaymentName);
+        amount = view.findViewById(R.id.editTextPaymentAmount);
+        contact = view.findViewById(R.id.editTextPaymentContactNo);
+        email = view.findViewById(R.id.editTextPaymentEmail);
+
+        // Bundle to fetch information of user
+        Bundle bundle;
+        bundle = getArguments();
+        String apartmentCode = bundle.getString("userAptCode");
+
+        userName = bundle.getString("userName");
+        userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        userPhone = bundle.getString("userPhoneNo");
+
+        aptCode = bundle.getString("userAptCode");
+
+        name.setText(userName);
+        email.setText(userEmail);
+        contact.setText(userPhone);
+
+        name.setEnabled(false);
+        email.setEnabled(false);
+        contact.setEnabled(false);
+        amount.setEnabled(false);
+
+        // code to fetch the current maintenance of the building
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference();
+
+        reference.child("apartments").child(apartmentCode).child("maintenance").addValueEventListener(new ValueEventListener()
         {
-            //Getting the values from the EditTexts
-            String amount = amountEt.getText().toString();
-            String note = noteEt.getText().toString();
-            String name = nameEt.getText().toString();
-            String upiId = upiIdEt.getText().toString();
-            //method for payment using UPI
-            payUsingUpi(amount, upiId, name, note);
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot)
+            {
+                if(snapshot.exists())
+                {
+                    String maintenance = snapshot.getValue(String.class);
+                    amount.setText(String.valueOf(maintenance));
+                }
+                else
+                {
+                    Toast.makeText(getActivity(),"Data does not exist",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error)
+            {
+                Toast.makeText(getActivity(),"Error in data fetching",Toast.LENGTH_SHORT).show();
+            }
         });
 
+
+        paybtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                makePayment();
+            }
+        });
 
         return view;
     }
 
-    void payUsingUpi(String amount, String upiId, String name, String note)
+
+    private void makePayment()
     {
+        Checkout checkout = new Checkout();
+        checkout.setKeyID("rzp_test_gTM9m9XQSFWHPc");//key which is generated on razorpay account
 
-        Uri uri = Uri.parse("upi://pay").buildUpon()
-                .appendQueryParameter("pa", upiId)
-                .appendQueryParameter("pn", name)
-                .appendQueryParameter("mc","")
-                .appendQueryParameter("tid","02125412")
-                .appendQueryParameter("tr","25584584")
-                .appendQueryParameter("tn", note)
-                .appendQueryParameter("am", amount)
-                .appendQueryParameter("cu", "INR")
-                .build();
+//        checkout.setImage(R.drawable.logo); // for logo of company
+        // You need to pass current activity in order to let Razorpay create CheckoutActivity
+        final PaymentFragment activity = this;
 
+        try {
+            JSONObject options = new JSONObject();
 
-        Intent upiPayIntent = new Intent(Intent.ACTION_VIEW);
-        upiPayIntent.setData(uri);
+            options.put("name", "MarkTech");
+            options.put("description", "Reference No. #123456");
+            //You can omit the image option to fetch the image from dashboard
+            options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.png");
+//             options.put("order_id", "order_DBJOWzybf0sJbb");//from response of step 3.
+            options.put("theme.color", "#3399cc");
+            options.put("currency", "INR");
 
-        // will always show a dialog to user to choose an app
-        Intent chooser = Intent.createChooser(upiPayIntent, "Pay with");
+            Integer paymentAmount = Integer.parseInt(amount.getText().toString());
+            paymentAmount *= 100;
 
-        // check if intent resolves
-        if(null != chooser.resolveActivity(getActivity().getPackageManager())) {
-            startActivityForResult(chooser, UPI_PAYMENT);
-        } else {
-            Toast.makeText(getActivity(),"No UPI app found, please install one to continue",Toast.LENGTH_SHORT).show();
+            options.put("amount", String.valueOf(paymentAmount));//300 X 100
+            options.put("prefill.email", userEmail);
+            options.put("prefill.contact",userPhone);
+            checkout.open(getActivity(), options);
+        }
+        catch(Exception e)
+        {
+            Log.e("TAG", "Error in starting Razorpay Checkout", e);
         }
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
-
-        switch (requestCode)
-        {
-            case UPI_PAYMENT:
-                if ((RESULT_OK == resultCode) || (resultCode == 11))
-                {
-                    if (data != null)
-                    {
-                        String string = data.getStringExtra("response");
-                        Log.d("UPI", "onActivityResult: " + string);
-                        ArrayList<String> dataList = new ArrayList<>();
-                        dataList.add(string);
-                        upiPaymentDataOperation(dataList);
-                    }
-                    else
-                    {
-                        Log.d("UPI", "onActivityResult: " + "Return data is null");
-                        ArrayList<String> dataList = new ArrayList<>();
-                        dataList.add("nothing");
-                        upiPaymentDataOperation(dataList);
-                    }
-                }
-                else
-                {
-                    Log.d("UPI", "onActivityResult: " + "Return data is null"); //when user simply back without payment
-                    ArrayList<String> dataList = new ArrayList<>();
-                    dataList.add("nothing");
-                    upiPaymentDataOperation(dataList);
-                }
-                break;
-        }
-    }
-
-    private void upiPaymentDataOperation(ArrayList<String> data)
+    public void onPaymentSuccess(String s)
     {
-        if (isConnectionAvailable(getActivity()))
+        String str = "Successful payment ID :"+s;
+        paytext.setText(str);
+
+        LocalDate currentdate = LocalDate.now();
+        Month currentMonth = currentdate.getMonth();
+        String month = currentMonth.toString();
+
+        paybtn.setEnabled(false);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference();
+
+        reference.child("apartments").child(aptCode).child("balance").addValueEventListener(new ValueEventListener()
         {
-            String str = data.get(0);
-            Log.d("UPIPAY", "upiPaymentDataOperation: "+str);
-            String paymentCancel = "";
-            if(str == null) str = "discard";
-            String status = "";
-            String approvalRefNo = "";
-            String response[] = str.split("&");
-            for (int i = 0; i < response.length; i++)
-            { 
-                String equalStr[] = response[i].split("=");
-                if(equalStr.length >= 2) {
-                    if (equalStr[0].toLowerCase().equals("status".toLowerCase())) {
-                        status = equalStr[1].toLowerCase();
-                    }
-                    else if (equalStr[0].toLowerCase().equals("ApprovalRefNo".toLowerCase()) || equalStr[0].toLowerCase().equals("txnRef".toLowerCase())) {
-                        approvalRefNo = equalStr[1];
-                    }
-                }
-                else {
-                    paymentCancel = "Payment cancelled by user.";
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if(snapshot.exists())
+                {
+                    String balance = snapshot.getValue(String.class);
+                    Integer bal = Integer.parseInt(balance);
+                    bal += Integer.parseInt(amount.getText().toString());
+                    reference.child("apartments").child(aptCode).child("balance").setValue(String.valueOf(bal));
                 }
             }
 
-            if (status.equals("success")) {
-                //Code to handle successful transaction here.
-                Toast.makeText(getActivity(), "Transaction successful.", Toast.LENGTH_SHORT).show();
-                Log.d("UPI", "responseStr: "+approvalRefNo);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
-            else if("Payment cancelled by user.".equals(paymentCancel)) {
-                Toast.makeText(getActivity(), "Payment cancelled by user.", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(getActivity(), "Transaction failed.Please try again", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Toast.makeText(getActivity(), "Internet connection is not available. Please check and try again", Toast.LENGTH_SHORT).show();
-        }
+        });
+
+        Toast.makeText(getActivity(),month,Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), "Payment Successful", Toast.LENGTH_SHORT).show();
     }
 
-    public static boolean isConnectionAvailable(Context context)
+    @Override
+    public void onPaymentError(int i, String s)
     {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null)
-        {
-            NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
-            if (netInfo != null && netInfo.isConnected()
-                    && netInfo.isConnectedOrConnecting()
-                    && netInfo.isAvailable()) {
-                return true;
-            }
-        }
-        return false;
+        String str = "Failed and cause is :"+s;
+        paytext.setText(str);
+        Toast.makeText(getActivity(),"Payment Failed",Toast.LENGTH_SHORT).show();
     }
+
+
+
 
 }
