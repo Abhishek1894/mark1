@@ -40,7 +40,7 @@ import java.time.Month;
 public class RazorpayPayment extends AppCompatActivity implements PaymentResultListener
 {
 
-    Button paybtn;
+    Button paybtn, cancelBtn;
     TextView paytext;
 
     String name,phoneNo,email,aptcode,amount,status,balance,updatedBalance;
@@ -57,6 +57,7 @@ public class RazorpayPayment extends AppCompatActivity implements PaymentResultL
 
         paytext=(TextView)findViewById(R.id.paytext);
         paybtn=(Button)findViewById(R.id.razorpayBtn);
+        cancelBtn = findViewById(R.id.cancelPaymentBtn);
 
 
         // fetching user data from database
@@ -127,8 +128,22 @@ public class RazorpayPayment extends AppCompatActivity implements PaymentResultL
                 makepayment();
             }
         });
+
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
+
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
+
+    // code for razorpay payment
     private void makepayment()
     {
 
