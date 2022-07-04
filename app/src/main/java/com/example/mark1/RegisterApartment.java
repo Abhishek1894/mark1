@@ -147,18 +147,18 @@ public class RegisterApartment extends AppCompatActivity
 
                             ArrayList<String> monthList = new ArrayList<>();
 
-                            monthList.add("January");
-                            monthList.add("February");
-                            monthList.add("March");
-                            monthList.add("April");
-                            monthList.add("May");
-                            monthList.add("June");
-                            monthList.add("July");
-                            monthList.add("August");
-                            monthList.add("September");
-                            monthList.add("October");
-                            monthList.add("November");
-                            monthList.add("December");
+                            monthList.add("JANUARY");
+                            monthList.add("FEBRUARY");
+                            monthList.add("MARCH");
+                            monthList.add("APRIL");
+                            monthList.add("MAY");
+                            monthList.add("JUNE");
+                            monthList.add("JULY");
+                            monthList.add("AUGUST");
+                            monthList.add("SEPTEMBER");
+                            monthList.add("OCTOBER");
+                            monthList.add("NOVEMBER");
+                            monthList.add("DECEMBER");
 
                             for(String data : monthList)
                             {

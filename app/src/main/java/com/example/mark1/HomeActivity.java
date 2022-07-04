@@ -77,6 +77,7 @@ public class HomeActivity extends AppCompatActivity
                         maintenanceUpdateFragment.setArguments(bundle);
                         MembersFragment.setArguments(bundle);
                         paymentFragment.setArguments(bundle);
+                        recordFragment.setArguments(bundle);
 
 //                        Toast.makeText(HomeActivity.this, "sending data userName = "+user.getName(), Toast.LENGTH_SHORT).show();
                     }

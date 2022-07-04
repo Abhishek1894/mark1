@@ -20,6 +20,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class JoinApartmentActivity extends AppCompatActivity
@@ -99,7 +100,9 @@ public class JoinApartmentActivity extends AppCompatActivity
                     if(snapshot.exists())
                     {
                         // As apartment code is valid user will be added to to particular apartment
-                        joinApartment(userName,userPhoneNo,userEmail,userPassword,userApartmentCode);
+                        String maintenance = snapshot.child("maintenance").getValue(String.class);
+                        Toast.makeText(JoinApartmentActivity.this,maintenance,Toast.LENGTH_LONG).show();
+                        joinApartment(userName,userPhoneNo,userEmail,userPassword,userApartmentCode,maintenance);
                     }
                     else
                     {
@@ -118,7 +121,7 @@ public class JoinApartmentActivity extends AppCompatActivity
     }
 
     // This method will be invoked when user clicks on join apartment button
-    public void joinApartment(String name, String phoneNo, String email,String password, String aptCode)
+    public void joinApartment(String name, String phoneNo, String email,String password, String aptCode, String maintenance)
     {
         auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>()
@@ -139,6 +142,33 @@ public class JoinApartmentActivity extends AppCompatActivity
 
                             reference.child("users").child(email.substring(0,email.length() - 4)).setValue(user);
                             Toast.makeText(JoinApartmentActivity.this,"Data Saved Successfully",Toast.LENGTH_SHORT).show();
+
+                            // code for adding users in payment records
+                            HashMap<String,Object> record = new HashMap<>();
+                            record.put("name",name);
+                            record.put("aptcode",aptCode);
+                            record.put("amount","0");
+                            record.put("status",false);
+
+                            ArrayList<String> monthList = new ArrayList<>();
+
+                            monthList.add("JANUARY");
+                            monthList.add("FEBRUARY");
+                            monthList.add("MARCH");
+                            monthList.add("APRIL");
+                            monthList.add("MAY");
+                            monthList.add("JUNE");
+                            monthList.add("JULY");
+                            monthList.add("AUGUST");
+                            monthList.add("SEPTEMBER");
+                            monthList.add("OCTOBER");
+                            monthList.add("NOVEMBER");
+                            monthList.add("DECEMBER");
+
+                            for(String data : monthList)
+                            {
+                                reference.child("payments").child(data).child(email.substring(0,email.length() - 4)).setValue(record);
+                            }
 
                             // After the data is registered user will be directed to login page
                             Intent intent = new Intent(JoinApartmentActivity.this,LoginActivity.class);

@@ -146,7 +146,7 @@ public class ProfileFragment extends Fragment
 
 
         // code to share apartment code
-        ImageView shareCode = view.findViewById(R.id.imageViewShareIcon);
+        Button shareCode = view.findViewById(R.id.imageViewShareIcon);
         // String shCode = user.getAptCode();
         // code to add clickListener to image
         shareCode.setOnClickListener(v->
