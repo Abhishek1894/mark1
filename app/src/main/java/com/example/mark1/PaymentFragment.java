@@ -14,8 +14,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,6 +41,7 @@ import org.w3c.dom.Text;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.ArrayList;
 
 
 public class PaymentFragment extends Fragment  implements PaymentResultListener{
@@ -47,9 +51,11 @@ public class PaymentFragment extends Fragment  implements PaymentResultListener{
     Button paybtn;
     TextView paytext;
 
-    EditText email , amount , name , contact;
+    TextView email , amount , name , contact;
 
     String userName,userEmail,userPhone,aptCode;
+
+    Spinner monthSpinner;
 
     public PaymentFragment()
     {
@@ -75,6 +81,60 @@ public class PaymentFragment extends Fragment  implements PaymentResultListener{
         amount = view.findViewById(R.id.editTextPaymentAmount);
         contact = view.findViewById(R.id.editTextPaymentContactNo);
         email = view.findViewById(R.id.editTextPaymentEmail);
+        monthSpinner = view.findViewById(R.id.spinnerSelectMonth);
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference reference = database.getReference();
+
+        ArrayList<String> monthList = new ArrayList<>();
+        monthList.add("JANUARY");
+        monthList.add("FEBRUARY");
+        monthList.add("MARCH");
+        monthList.add("APRIL");
+        monthList.add("MAY");
+        monthList.add("JUNE");
+        monthList.add("JULY");
+        monthList.add("AUGUST");
+        monthList.add("SEPTEMBER");
+        monthList.add("OCTOBER");
+        monthList.add("NOVEMBER");
+        monthList.add("DECEMBER");
+
+        ArrayAdapter<String> monthSpinnerAdapter = new ArrayAdapter<>(getActivity(), com.razorpay.R.layout.support_simple_spinner_dropdown_item,monthList);
+        monthSpinner.setAdapter(monthSpinnerAdapter);
+
+        // to show the correct maintenance cost of particular month
+        monthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l)
+            {
+                String mail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                reference.child("payments").child(monthList.get(i)).child(mail.substring(0,mail.length() - 4)).child("amount").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot)
+                    {
+                        if(snapshot.exists())
+                        {
+                            String amountCost = snapshot.getValue(String.class);
+                            amount.setText(amountCost);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView)
+            {
+
+            }
+        });
+
 
         // Bundle to fetch information of user
         Bundle bundle;
@@ -91,40 +151,8 @@ public class PaymentFragment extends Fragment  implements PaymentResultListener{
         email.setText(userEmail);
         contact.setText(userPhone);
 
-        name.setEnabled(false);
-        email.setEnabled(false);
-        contact.setEnabled(false);
-        amount.setEnabled(false);
-
-        // code to fetch the current maintenance of the building
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference = database.getReference();
-
-        reference.child("apartments").child(apartmentCode).child("maintenance").addValueEventListener(new ValueEventListener()
+        paybtn.setOnClickListener(new View.OnClickListener()
         {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot)
-            {
-                if(snapshot.exists())
-                {
-                    String maintenance = snapshot.getValue(String.class);
-                    amount.setText(String.valueOf(maintenance));
-                }
-                else
-                {
-                    Toast.makeText(getActivity(),"Data does not exist",Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error)
-            {
-                Toast.makeText(getActivity(),"Error in data fetching",Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        paybtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
