@@ -20,6 +20,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+// for fetching current date and month
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.ArrayList;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link maintenanceUpdateFragment#newInstance} factory method to
@@ -128,10 +133,70 @@ public class maintenanceUpdateFragment extends Fragment
         else
             update.setEnabled(true);
 
+        ArrayList<String> monthList = new ArrayList<>();
+
+        monthList.add("JANUARY");
+        monthList.add("FEBRUARY");
+        monthList.add("MARCH");
+        monthList.add("APRIL");
+        monthList.add("MAY");
+        monthList.add("JUNE");
+        monthList.add("JULY");
+        monthList.add("AUGUST");
+        monthList.add("SEPTEMBER");
+        monthList.add("OCTOBER");
+        monthList.add("NOVEMBER");
+        monthList.add("DECEMBER");
+
+
+
+        // code to update maintenance cost
         update.setOnClickListener(v ->
         {
             reference.child("apartments").child(apartmentCode).child("maintenance").setValue(updateMaintenance.getText().toString());
             Toast.makeText(getActivity(), "Maintenance updated successfully", Toast.LENGTH_SHORT).show();
+
+
+//            for(String data : members)
+//                Toast.makeText(getActivity(),data,Toast.LENGTH_LONG).show();
+
+            // code for updating maintenance in payment database
+            LocalDate date = LocalDate.now();
+
+            Month month = date.getMonth();
+
+            int index = monthList.indexOf(month.toString());
+
+            for(int i = index; i < monthList.size(); i++)
+            {
+                String currentMonth = monthList.get(i);
+
+                reference.child("payments").child("APRIL").addValueEventListener(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot)
+                    {
+                        if(snapshot.exists())
+                        {
+                            for(DataSnapshot data : snapshot.getChildren())
+                            {
+                                Record record = data.getValue(Record.class);
+                                if(record.getAptcode().equals(apartmentCode))
+                                {
+                                    reference.child("payments").child(currentMonth).child(data.getKey()).child("amount").setValue(updateMaintenance.getText().toString());
+                                    Toast.makeText(getActivity(),data.getKey(),Toast.LENGTH_LONG).show();
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error)
+                    {
+
+                    }
+                });
+            }
         });
 
         return view;

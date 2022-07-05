@@ -3,7 +3,7 @@ package com.example.mark1;
 public class Record
 {
     String amount;
-    String apartmentCode;
+    String aptcode;
     String name;
     boolean status;
 
@@ -18,7 +18,7 @@ public class Record
         this.amount = amount;
         this.name = name;
         this.status = status;
-        this.apartmentCode = apartmentCode;
+        this.aptcode = apartmentCode;
     }
 
     public String getAmount()
@@ -31,14 +31,14 @@ public class Record
         this.amount = amount;
     }
 
-    public String getApartmentCode()
+    public String getAptcode()
     {
-        return apartmentCode;
+        return aptcode;
     }
 
-    public void setApartmentCode(String apartmentCode)
+    public void setAptcode(String aptcode)
     {
-        this.apartmentCode = apartmentCode;
+        this.aptcode = aptcode;
     }
 
     public String getName()

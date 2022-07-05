@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,6 +30,8 @@ public class RecordFragment extends Fragment
     ArrayList<Record> recordList = new ArrayList<>();
 
     Spinner monthSpinner;
+
+    String aptCode;
 
 
     public RecordFragment()
@@ -49,10 +52,11 @@ public class RecordFragment extends Fragment
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         RecordRecyclerAdapter recordRecyclerAdapter = new RecordRecyclerAdapter(getActivity(),recordList);
 
-        //fetching data using bundle from HomeActivity
+        // fetching data using bundle from HomeActivity
         Bundle bundle;
         bundle = getArguments();
-        String aptCode = bundle.getString("userAptCode");
+        aptCode = bundle.getString("userAptCode");
+
 
         monthSpinner = view.findViewById(R.id.monthSpinner);
 
@@ -83,7 +87,6 @@ public class RecordFragment extends Fragment
             {
                 // function is invoked to show records
                 showRecords(aptCode,monthList.get(position),recordRecyclerAdapter);
-                Toast.makeText(getActivity(),monthList.get(position),Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -116,8 +119,9 @@ public class RecordFragment extends Fragment
                     {
                         Record record = data.getValue(Record.class);
 
-//                        if(record.getApartmentCode().equals(apartmentCode))
+                        if(record.getAptcode().equals(apartmentCode))
                             recordList.add(record);
+
                     }
 
                     recordRecyclerAdapter.notifyDataSetChanged();
