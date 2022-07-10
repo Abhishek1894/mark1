@@ -26,7 +26,7 @@ class SplashThread extends Thread // thread to display splash screen
     {
         try
         {
-            Thread.sleep(3000); // splash screen will appear for 3 seconds
+            Thread.sleep(2000); // splash screen will appear for 2 seconds
 
             FirebaseUser user = auth.getCurrentUser(); // to get the current user of app
 

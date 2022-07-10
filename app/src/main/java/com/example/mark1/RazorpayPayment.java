@@ -39,12 +39,12 @@ import java.time.Month;
 
 public class RazorpayPayment extends AppCompatActivity implements PaymentResultListener
 {
-
-    Button paybtn, cancelBtn;
     TextView paytext;
 
-    String name,phoneNo,email,aptcode,amount,status,balance,updatedBalance;
+    String name,phoneNo,userEmail,aptcode,amount,status,balance,updatedBalance;
 
+    // variable to store month selected by the user
+    String selectedMonth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -56,12 +56,17 @@ public class RazorpayPayment extends AppCompatActivity implements PaymentResultL
         Checkout.preload(getApplicationContext());
 
         paytext=(TextView)findViewById(R.id.paytext);
-        paybtn=(Button)findViewById(R.id.razorpayBtn);
-        cancelBtn = findViewById(R.id.cancelPaymentBtn);
+
+        // getting data from previous fragment
+        Intent intent = getIntent();
+        selectedMonth = intent.getStringExtra("month");
+        amount = intent.getStringExtra("amount");
+
+        Toast.makeText(RazorpayPayment.this,selectedMonth + " " + amount,Toast.LENGTH_LONG).show();
 
 
         // fetching user data from database
-        String userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+        userEmail = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference();
@@ -74,36 +79,15 @@ public class RazorpayPayment extends AppCompatActivity implements PaymentResultL
                 if(snapshot.exists())
                 {
                     User user = snapshot.getValue(User.class);
-                    if(user!=null) {
+                    if(user!=null)
+                    {
                         //passing User object to other fragments
                         name = user.getName();
-                        email = user.getEmail();
+                        // userEmail = user.getEmail();
                         phoneNo = user.getPhoneNo();
                         status = user.getStatus();
                         aptcode = user.getAptCode();
 
-                        // fetching maintenace from the database
-                        reference.child("apartments").child(aptcode).child("maintenance").addValueEventListener(new ValueEventListener()
-                        {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot)
-                            {
-                                if(snapshot.exists())
-                                {
-                                    amount = snapshot.getValue(String.class);
-                                }
-                                else
-                                {
-                                    Toast.makeText(RazorpayPayment.this,"Data does not exist",Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error)
-                            {
-                                Toast.makeText(RazorpayPayment.this,"Error in data fetching",Toast.LENGTH_SHORT).show();
-                            }
-                        });
                     }
                 }
                 else
@@ -120,21 +104,7 @@ public class RazorpayPayment extends AppCompatActivity implements PaymentResultL
             }
         });
 
-        paybtn.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                makepayment();
-            }
-        });
-
-        cancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onBackPressed();
-            }
-        });
+        makepayment();
 
     }
 
@@ -169,7 +139,7 @@ public class RazorpayPayment extends AppCompatActivity implements PaymentResultL
             paymentAmount *= 100;
 
             options.put("amount", String.valueOf(paymentAmount));//300 X 100
-            options.put("prefill.email", email);
+            options.put("prefill.email", userEmail);
             options.put("prefill.contact",phoneNo);
             checkout.open(activity, options);
         } catch(Exception e)
@@ -182,20 +152,14 @@ public class RazorpayPayment extends AppCompatActivity implements PaymentResultL
     @Override
     public void onPaymentSuccess(String s)
     {
-
-        paytext.setText("Successful payment ID :"+s);
-        Toast.makeText(this, "Payment Successful", Toast.LENGTH_SHORT).show();
-//        paybtn.setEnabled(false);
-
-        LocalDate currentdate = LocalDate.now();
-        Month currentMonth = currentdate.getMonth();
-        String month = currentMonth.toString();
-
-        // paybtn.setEnabled(false);
+        paytext.setBackgroundResource(R.color.green);
+        paytext.setText("Payment Successful");
+        Toast.makeText(this, "Successful payment ID :"+s, Toast.LENGTH_SHORT).show();
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reference = database.getReference();
 
+        // updating the balance of the apartment
         reference.child("apartments").child(aptcode).child("balance").addListenerForSingleValueEvent(new ValueEventListener()
         {
             @Override
@@ -220,11 +184,14 @@ public class RazorpayPayment extends AppCompatActivity implements PaymentResultL
     }
 
     @Override
-    public void onPaymentError(int i, String s) {
-        paytext.setText("Failed and cause is :"+s);
+    public void onPaymentError(int i, String s)
+    {
+        paytext.setBackgroundResource(R.color.red);
+        paytext.setText("Payment Failed");
     }
 
 
+    // method to increment the balance in database
     private void setBalance(String balance)
     {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -237,6 +204,9 @@ public class RazorpayPayment extends AppCompatActivity implements PaymentResultL
         Toast.makeText(this,updatedBalance,Toast.LENGTH_LONG).show();
 
         reference.child("apartments").child(aptcode).child("balance").setValue(updatedBalance);
+
+        // updating the flag value to indicate maintenance is paid
+        reference.child("payments").child(selectedMonth).child(userEmail.substring(0,userEmail.length() - 4)).child("status").setValue(true);
     }
 
 }

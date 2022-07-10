@@ -132,7 +132,7 @@ public class RegisterApartment extends AppCompatActivity
                             HashMap<String,Object> apartment = new HashMap<>();
                             apartment.put("name",apartmentName);
                             apartment.put("balance","0");
-                            apartment.put("maintenance","0");
+                            apartment.put("maintenance","1");
 
                             // code for adding new user in real-time database
                             reference.child("users").child(email.substring(0,email.length() - 4)).setValue(user);
@@ -142,7 +142,7 @@ public class RegisterApartment extends AppCompatActivity
                             HashMap<String,Object> record = new HashMap<>();
                             record.put("name",name);
                             record.put("aptcode",aptCode);
-                            record.put("amount","0");
+                            record.put("amount","1");
                             record.put("status",false);
 
                             ArrayList<String> monthList = new ArrayList<>();

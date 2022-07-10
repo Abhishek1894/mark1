@@ -144,10 +144,11 @@ public class JoinApartmentActivity extends AppCompatActivity
                             Toast.makeText(JoinApartmentActivity.this,"Data Saved Successfully",Toast.LENGTH_SHORT).show();
 
                             // code for adding users in payment records
+
                             HashMap<String,Object> record = new HashMap<>();
                             record.put("name",name);
                             record.put("aptcode",aptCode);
-                            record.put("amount","0");
+                            record.put("amount","1");
                             record.put("status",false);
 
                             ArrayList<String> monthList = new ArrayList<>();

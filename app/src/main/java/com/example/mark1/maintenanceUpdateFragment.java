@@ -112,7 +112,7 @@ public class maintenanceUpdateFragment extends Fragment
                 if(snapshot.exists())
                 {
                     String maintenance = snapshot.getValue(String.class);
-                    String c = "Current Maintenance = "+maintenance+ " Rs.";
+                    String c = "Current Maintenance Cost= "+maintenance+ " Rs.";
                     currentMaintenance.setText(c);
                 }
                 else

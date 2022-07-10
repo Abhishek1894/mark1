@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Apartment</string>
+    <string name="app_name">Maintenance Plus</string>
     <string name="buttonRegisterApartment">Register Apartment</string>
     <string name="buttonLogin">Login</string>
     <string name="buttonJoinApartment">Join Apartment</string>

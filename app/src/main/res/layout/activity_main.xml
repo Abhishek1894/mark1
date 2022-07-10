@@ -5,28 +5,26 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F4F0F0"
+    android:background="#F44336"
     tools:context=".SplashActivity">
 
+
     <ImageView
-        android:id="@+id/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/apt"
+        android:id="@+id/aptLogo"
+        android:layout_width="99dp"
+        android:layout_height="88dp"
         android:layout_centerInParent="true"
-        />
+        android:src="@drawable/apt" />
 
     <TextView
-        android:id="@+id/appName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/logo"
         android:text="Maintenance Plus"
+        android:textSize="18dp"
         android:textStyle="bold"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
-        android:textSize="28dp"
-        android:textColor="#3A3433"/>
-
+        android:textColor="@color/white"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/aptLogo"
+        android:layout_centerHorizontal="true"/>
 
 </RelativeLayout>

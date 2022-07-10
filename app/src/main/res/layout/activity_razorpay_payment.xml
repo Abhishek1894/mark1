@@ -8,76 +8,26 @@
     tools:context=".RazorpayPayment"
     android:background="#DEF8F6F6">
 
-
     <androidx.cardview.widget.CardView
-        android:layout_width="380dp"
-        android:layout_height="380dp"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
         android:layout_centerInParent="true"
-        android:layout_marginBottom="150dp"
-        app:cardCornerRadius="12dp">
-
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/linearLayoutPayment"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="50dp"
-            android:text="Are you sure ?"
-            android:textColor="#000"
-            android:textSize="22sp" />
-
-
-        <!--    <Button-->
-<!--        android:id="@+id/razorpayBtn"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_centerInParent="true"-->
-<!--        android:text="Pay with RAZORPAY"-->
-<!--        />-->
-
-
-        <RelativeLayout
-            android:id="@+id/linearLayoutPayment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center"
-            android:orientation="vertical">
-
-            <Button
-                android:id="@+id/razorpayBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp"
-                android:text="Pay with RAZORPAY"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/cancelPaymentBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/razorpayBtn"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="20dp"
-                android:text="Cancel Payment"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
-        </RelativeLayout>
-
-        <TextView
-            android:id="@+id/paytext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/linearLayoutPayment"
-            android:layout_marginTop="270dp"
-            android:text=""
-            android:textColor="#000"
-            android:textSize="16sp"
-            android:layout_gravity="center_horizontal"/>
+        app:cardElevation="5dp"
+        app:cardCornerRadius="10dp"
+        app:cardUseCompatPadding="true"
+        >
+            <TextView
+                android:id="@+id/paytext"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="#ffff"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:text="Succesful payment"
+                android:gravity="center"
+                />
 
     </androidx.cardview.widget.CardView>
+
 
 </RelativeLayout>

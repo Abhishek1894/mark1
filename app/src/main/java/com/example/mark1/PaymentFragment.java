@@ -44,9 +44,8 @@ import java.time.Month;
 import java.util.ArrayList;
 
 
-public class PaymentFragment extends Fragment  implements PaymentResultListener{
-
-
+public class PaymentFragment extends Fragment
+{
 
     Button paybtn;
     TextView paytext;
@@ -56,6 +55,9 @@ public class PaymentFragment extends Fragment  implements PaymentResultListener{
     String userName,userEmail,userPhone,aptCode;
 
     Spinner monthSpinner;
+
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference reference = database.getReference();
 
     public PaymentFragment()
     {
@@ -82,9 +84,6 @@ public class PaymentFragment extends Fragment  implements PaymentResultListener{
         contact = view.findViewById(R.id.editTextPaymentContactNo);
         email = view.findViewById(R.id.editTextPaymentEmail);
         monthSpinner = view.findViewById(R.id.spinnerSelectMonth);
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference = database.getReference();
 
         ArrayList<String> monthList = new ArrayList<>();
         monthList.add("JANUARY");
@@ -154,132 +153,62 @@ public class PaymentFragment extends Fragment  implements PaymentResultListener{
         paybtn.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View view) {
+            public void onClick(View view)
+            {
+                // checking whether the month is valid or not and checking whether payment is already done or not
+                LocalDate date = LocalDate.now();
+                Month month = date.getMonth();
+                int index1 = monthList.indexOf(month.toString());
 
-            Intent intent= new Intent(getActivity(),RazorpayPayment.class);
-            startActivity(intent);
-                ((Activity) getActivity()).overridePendingTransition(0, 0);
+                String selectedMonth = (String)monthSpinner.getSelectedItem();
+                int index2 = monthList.indexOf(selectedMonth);
 
-//                makePayment();
+                if(index1 < index2)
+                {
+                    Toast.makeText(getActivity(), "You can only make payment of current and previous months", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+
+                String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+                reference.child("payments").child(selectedMonth).child(email.substring(0,email.length() - 4)).child("status").addListenerForSingleValueEvent(new ValueEventListener()
+                {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot)
+                    {
+                        if(snapshot.exists())
+                        {
+                            Boolean status = snapshot.getValue(Boolean.class);
+
+                            if(status)
+                            {
+                                Toast.makeText(getActivity(),"You have already paid maintenance cost of " + selectedMonth, Toast.LENGTH_LONG).show();
+                            }
+                            else
+                            {
+                                Intent intent = new Intent(getActivity(), RazorpayPayment.class);
+                                intent.putExtra("month",selectedMonth);
+                                intent.putExtra("name",name.getText().toString());
+                                intent.putExtra("amount",amount.getText().toString());
+                                intent.putExtra("contact",contact.getText().toString());
+                                startActivity(intent);
+                                ((Activity) getActivity()).overridePendingTransition(0, 0);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error)
+                    {
+
+                    }
+                });
+
+
             }
         });
 
         return view;
     }
-
-
-    private void makePayment()
-    {
-        Checkout checkout = new Checkout();
-        checkout.setKeyID("rzp_test_gTM9m9XQSFWHPc");//key which is generated on razorpay account
-
-//        checkout.setImage(R.drawable.logo); // for logo of company
-        // You need to pass current activity in order to let Razorpay create CheckoutActivity
-        final PaymentFragment activity = this;
-
-        try {
-            JSONObject options = new JSONObject();
-
-            options.put("name", "MarkTech");
-            options.put("description", "Reference No. #123456");
-            //You can omit the image option to fetch the image from dashboard
-            options.put("image", "https://s3.amazonaws.com/rzp-mobile/images/rzp.png");
-//             options.put("order_id", "order_DBJOWzybf0sJbb");//from response of step 3.
-            options.put("theme.color", "#3399cc");
-            options.put("currency", "INR");
-
-            Integer paymentAmount = Integer.parseInt(amount.getText().toString());
-            paymentAmount *= 100;
-
-            options.put("amount", String.valueOf(paymentAmount));//300 X 100
-            options.put("prefill.email", userEmail);
-            options.put("prefill.contact",userPhone);
-            checkout.open(getActivity(), options);
-        }
-        catch(Exception e)
-        {
-            Log.e("TAG", "Error in starting Razorpay Checkout", e);
-        }
-    }
-
-    @Override
-    public void onPaymentSuccess(String s)
-    {
-        String str = "Successful payment ID :"+s;
-        paytext.setText(str);
-
-        LocalDate currentdate = LocalDate.now();
-        Month currentMonth = currentdate.getMonth();
-        String month = currentMonth.toString();
-
-        // paybtn.setEnabled(false);
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference = database.getReference();
-
-        reference.child("apartments").child(aptCode).child("balance").addValueEventListener(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                if(snapshot.exists())
-                {
-                    String balance = snapshot.getValue(String.class);
-                    Integer bal = Integer.parseInt(balance);
-                    bal += Integer.parseInt(amount.getText().toString());
-                    reference.child("apartments").child(aptCode).child("balance").setValue(String.valueOf(bal));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        Toast.makeText(getActivity(),month,Toast.LENGTH_SHORT).show();
-        Toast.makeText(getActivity(), "Payment Successful", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onPaymentError(int i, String s)
-    {
-        String str = "Failed and cause is :"+s;
-        paytext.setText(str);
-        Toast.makeText(getActivity(),"Payment Failed",Toast.LENGTH_SHORT).show();
-
-        LocalDate currentdate = LocalDate.now();
-        Month currentMonth = currentdate.getMonth();
-        String month = currentMonth.toString();
-
-        // paybtn.setEnabled(false);
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference reference = database.getReference();
-
-        reference.child("apartments").child(aptCode).child("balance").addValueEventListener(new ValueEventListener()
-        {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                if(snapshot.exists())
-                {
-                    String balance = snapshot.getValue(String.class);
-                    Integer bal = Integer.parseInt(balance);
-                    bal += Integer.parseInt(amount.getText().toString());
-                    reference.child("apartments").child(aptCode).child("balance").setValue(String.valueOf(bal));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error)
-            {
-
-            }
-        });
-    }
-
-
-
 
 }
